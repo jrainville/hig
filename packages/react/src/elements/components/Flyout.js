@@ -26,7 +26,7 @@ export default class Flyout extends Component {
     return (
       <FlyoutAdapter
         anchorPoint={this.props.anchorPoint}
-        open={this.state.open}
+        open={this.props.open || this.state.open}
         onClickOutside={this.closeFlyout}
         content={this.props.content}
         maxHeight={this.props.maxHeight}
