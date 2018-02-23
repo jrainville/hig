@@ -5,35 +5,33 @@ import HeaderCheckbox from "./HeaderCheckbox";
 import RowCheckbox from "./RowCheckbox";
 
 export default class SelectableTable extends Component {
-  static propTypes = {
-    selectable: PropTypes.bool
-  };
-
-  static defaultProps = {
-    columns: [],
-    data: [],
-    onSelectAllSelectionChange: () => {},
-    onRowSelectionChange: () => {}
-  };
-
   constructor(props) {
     super(props);
+
+    const initialSelections = this.props.data.reduce(
+      (selections, row) => ({ ...selections, [row.id]: row.selected }),
+      {}
+    );
     this.state = {
-      rows: {},
-      allRowsSelected: false
+      rowsSelected: initialSelections
     };
   }
 
   selectRow = rowInfo => {
     const newRows = {
-      ...this.state.rows,
-      [rowInfo.id]: { selected: rowInfo.selected }
+      ...this.state.rowsSelected,
+      [rowInfo.id]: rowInfo.selected
     };
-    this.setState({ rows: newRows });
+    this.setState({ rowsSelected: newRows });
   };
 
   handleAllSelectionChange = event => {
-    this.setState({ allRowsSelected: event.target.checked });
+    this.props.data.forEach(row =>
+      this.handleRowCheckboxOnChange({
+        id: row.id,
+        selected: event.target.checked
+      })
+    );
     this.props.onSelectAllSelectionChange({ selected: event.target.checked });
   };
 
@@ -62,25 +60,14 @@ export default class SelectableTable extends Component {
     )
   });
 
-  isRowSelected(row) {
-    if (row.selected !== undefined) {
-      return row.selected;
-    } else if (this.state.rows[row.id] && this.state.rows[row.id].selected) {
-      return this.state.rows[row.id].selected;
-    }
-    return false;
-  }
-
   mergeRowState = row => ({
     ...row,
-    selected: this.isRowSelected(row)
+    selected: this.state.rowsSelected[row.id]
   });
 
   renderedAllRowsSelected() {
-    if (this.props.allRowsSelected !== undefined) {
-      return this.props.allRowsSelected;
-    }
-    return this.state.allRowsSelected;
+    const rowSelections = Object.values(this.state.rowsSelected);
+    return rowSelections.every(value => value);
   }
 
   render() {
@@ -98,11 +85,19 @@ SelectableTable.propTypes = {
   /**
    * Provides content table cells
    */
-  data: PropTypes.arrayOf(PropTypes.object),
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      selected: PropTypes.bool
+    })
+  ),
   /**
    * Called when user selects or deselects a row
    */
   onRowSelectionChange: PropTypes.func,
+  /**
+   * Function to render the table. Signature is fn(columns, data, density)
+   */
   children: PropTypes.func,
   /**
    * Called when user checks or unchecks the select-all checkbox
@@ -120,4 +115,11 @@ SelectableTable.propTypes = {
       Cell: PropTypes.any
     })
   )
+};
+
+SelectableTable.defaultProps = {
+  columns: [],
+  data: [],
+  onSelectAllSelectionChange: () => {},
+  onRowSelectionChange: () => {}
 };

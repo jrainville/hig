@@ -113,17 +113,24 @@ describe("SelectableTable", () => {
       });
     });
 
-    describe("state of individual rows", () => {
-      it("sets 'selected' attribute to appropriate value", () => {
+    describe("selectRow", () => {
+      it("updates selection state of a given row", () => {
         wrapperInstance.selectRow({ id: "1", selected: true });
-        expect(wrapperInstance.state.rows["1"].selected).toEqual(true);
+        expect(wrapperInstance.state.rowsSelected["1"]).toEqual(true);
       });
     });
 
-    describe("'allRowsSelected' state", () => {
-      it("manages value of 'allRowsSelected' state", () => {
+    describe("handleAllSelectionChange", () => {
+      it("marks all rows as selected based on provided argument", () => {
         wrapperInstance.handleAllSelectionChange({ target: { checked: true } });
-        expect(wrapperInstance.state.allRowsSelected).toEqual(true);
+        expect(wrapperInstance.state.rowsSelected["1"]).toEqual(true);
+        expect(wrapperInstance.state.rowsSelected["2"]).toEqual(true);
+
+        wrapperInstance.handleAllSelectionChange({
+          target: { checked: false }
+        });
+        expect(wrapperInstance.state.rowsSelected["1"]).toEqual(false);
+        expect(wrapperInstance.state.rowsSelected["2"]).toEqual(false);
       });
     });
   });
