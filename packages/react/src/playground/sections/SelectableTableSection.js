@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PlaygroundSection from "../PlaygroundSection";
 
-import { Button, Table, Icon, TextCellContent } from "../../hig-react";
+import { Table, Icon, TextCellContent } from "../../hig-react";
 
 const columns = [
   {
@@ -115,59 +115,27 @@ const data = [
   }
 ];
 
-class SelectableTableSection extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      columns,
-      data
-    };
-  }
-
-  onSelectionChange = selectedInfo => {
-    const updatedData = this.state.data.map(row => ({
-      ...row,
-      selected: selectedInfo.selected
-    }));
-    this.setState({ data: updatedData });
+export default class SelectableTableSection extends Component {
+  onSelectAllChange = selectedInfo => {
+    console.log("Select all toggled: ", selectedInfo);
   };
 
   checkboxHandler = selectedInfo => {
-    const existingData = this.state.data;
-    const selectedIndex = existingData.findIndex(
-      row => row.id === selectedInfo.id
-    );
-    existingData[selectedIndex].selected = selectedInfo.selected;
-    this.setState({ data: existingData });
-  };
-
-  randomizeSelections = () => {
-    const newData = this.state.data.map(row => ({
-      ...row,
-      selected: Math.random() > 0.5
-    }));
-    this.setState({ data: newData });
+    console.log("Row toggled: ", selectedInfo);
   };
 
   render() {
     return (
       <PlaygroundSection title="Selectable Table">
-        <Button
-          size="standard"
-          title="Randomize selections"
-          onClick={this.randomizeSelections}
-        />
         <Table
           density="standard"
-          columns={this.state.columns}
-          data={this.state.data}
+          columns={columns}
+          data={data}
           selectable
           onRowSelectionChange={this.checkboxHandler}
-          onSelectAllSelectionChange={this.onSelectionChange}
+          onSelectAllSelectionChange={this.onSelectAllChange}
         />
       </PlaygroundSection>
     );
   }
 }
-
-export default SelectableTableSection;
